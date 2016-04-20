@@ -16,9 +16,11 @@ namespace Hierarchy
             formatter.Serialize(stream, element);
         }
 
-        public void Deserialize(Stream stream)
+        public object Deserialize(Stream stream, object element)
         {
-
+            BinaryFormatter formatter = new BinaryFormatter();
+            element =formatter.Deserialize(stream);             
+            return element;
         }
     }
 }

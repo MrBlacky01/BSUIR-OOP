@@ -152,6 +152,19 @@ namespace Hierarchy
                 return;
             string filename = saveFileDialog1.FileName;
             int exe = saveFileDialog1.FilterIndex;
+            var a = new DictionaryForSerialize();
+            /*Dictionary<int, ISerializable> a = new Dictionary<int, ISerializable>();
+            XMLSerializerer b = new XMLSerializerer();
+            a.Add(1, b);*/
+            
+            try {
+                using (FileStream fs = new FileStream(filename, FileMode.Create, FileAccess.Write))
+                {
+                    a.dict[exe].Serialize(fs, ListOfDrinks);
+                }
+            
+            /*
+
             try
             {
 
@@ -192,8 +205,8 @@ namespace Hierarchy
                             break;
                         }
 
-                }
-            }
+                }*/
+        }
             catch (Exception exept1)
             {
                 MessageBox.Show(exept1.Message.ToString());

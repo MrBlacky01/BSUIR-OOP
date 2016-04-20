@@ -23,6 +23,7 @@ namespace Hierarchy
         int index;
         int indexForChange;
         bool afterChangebuttonAdd;
+        DictionaryForSerialize a = new DictionaryForSerialize();
 
         public HierarchyForm()
         {
@@ -146,72 +147,28 @@ namespace Hierarchy
             }
         }
 
+        
+
+        
+
         private void buttonSerialize_Click(object sender, EventArgs e)
         {
             if (saveFileDialog1.ShowDialog() == DialogResult.Cancel)
                 return;
             string filename = saveFileDialog1.FileName;
             int exe = saveFileDialog1.FilterIndex;
-            var a = new DictionaryForSerialize();
-            /*Dictionary<int, ISerializable> a = new Dictionary<int, ISerializable>();
-            XMLSerializerer b = new XMLSerializerer();
-            a.Add(1, b);*/
-            
-            try {
+           
+            try
+            {
                 using (FileStream fs = new FileStream(filename, FileMode.Create, FileAccess.Write))
                 {
                     a.dict[exe].Serialize(fs, ListOfDrinks);
                 }
-            
-            /*
-
-            try
-            {
-
-
-                switch (exe)
-                {
-                    case 1:
-                        {
-                            using (FileStream fs = new FileStream(filename, FileMode.Create, FileAccess.Write))
-                            {
-                                XmlSerializer serializer = new XmlSerializer(ListOfDrinks.GetType());                               
-                                serializer.Serialize(fs, ListOfDrinks);                                
-                            }
-                            break;
-                        }
-                    case 2:
-                        {
-                            BinaryFormatter formatter = new BinaryFormatter();
-
-                            using (FileStream fs = new FileStream(filename, FileMode.Create))
-                            {
-                                
-                                formatter.Serialize(fs, ListOfDrinks);
-                            }
-                            break;
-                        }
-                    case 3:
-                        {
-                            using (StreamWriter fs = new StreamWriter(filename))
-                            {
-                                foreach (Drinks el in ListOfDrinks)
-                                {
-                                    //byte[] array = System.Text.Encoding.Default.GetBytes(el.ToText()+"\n");
-                                    // запись массива байтов в файл
-                                    fs.WriteLine(el.ToText());
-                                }
-                            }
-                            break;
-                        }
-
-                }*/
-        }
+            }
             catch (Exception exept1)
             {
                 MessageBox.Show(exept1.Message.ToString());
             }
-
         }
 
         private void buttonDesirealize_Click(object sender, EventArgs e)
@@ -220,15 +177,30 @@ namespace Hierarchy
                 return;
             string filename = openFileDialog1.FileName;
             int exe = openFileDialog1.FilterIndex;
-           /* //IDictionary<int, ISeril> dict
-            //Dict by index serializer
-
-            using (FileStream fs = new FileStream(filename, FileMode.OpenOrCreate))
-            {
-                //serializer.Serialize()
-            }
-            */
             try
+            { 
+                using (FileStream fs = new FileStream(filename, FileMode.OpenOrCreate))
+                {
+                        ListOfDrinks = (List<Drinks>)a.dict[exe].Deserialize(fs, ListOfDrinks);
+                        AddElementsToListBoxAfterDeserialization();
+                   /* XmlSerializer serializer = new XmlSerializer(ListOfDrinks.GetType());
+                    ListOfDrinks = (List<Drinks>)serializer.Deserialize(fs);
+                    listBoxForDrinks.Items.Clear();
+                    foreach (Drinks element in ListOfDrinks)
+                    {
+
+                        listBoxForDrinks.Items.Add(element.ToString());
+                    }*/
+                }
+            /* //IDictionary<int, ISeril> dict
+             //Dict by index serializer
+
+             using (FileStream fs = new FileStream(filename, FileMode.OpenOrCreate))
+             {
+                 //serializer.Serialize()
+             }
+             */
+            /*try
             {
                 switch (exe)
                 {
@@ -321,13 +293,22 @@ namespace Hierarchy
                             }
                             break;
                         }
-                }
+                }*/
             }
             catch (Exception exx)
             {
                 MessageBox.Show(exx.Message.ToString());
             }
             
+        }
+
+        private void AddElementsToListBoxAfterDeserialization()
+        {
+            listBoxForDrinks.Items.Clear();
+            foreach (Drinks element in ListOfDrinks)
+            {
+                listBoxForDrinks.Items.Add(element.ToString());
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)

@@ -11,6 +11,6 @@ namespace Hierarchy
     interface ISerializable
     {
         void Serialize(Stream stream,object element);
-        void Deserialize(Stream stream);
+        object Deserialize(Stream stream, object element);
     }
 }

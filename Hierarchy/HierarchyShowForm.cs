@@ -22,12 +22,12 @@ namespace Hierarchy
         BuilderList buildList = new BuilderList();
         int index;
         int indexForChange;
+        bool afterChangebuttonAdd;
 
         public HierarchyForm()
         {
             InitializeComponent();
             AdditingElementsToCombobox();
-            // this.Width -= 500;
             panelForActions.Enabled = false;
         }
 
@@ -59,21 +59,34 @@ namespace Hierarchy
 
         private void buttonAdding_Click(object sender, EventArgs e)
         {
+            if (comboBoxDrinks.SelectedIndex != -1)
+            {
+                buildList[comboBoxDrinks.SelectedIndex].ClearPanel();
+                panelForActions.Enabled = false;
+                comboBoxDrinks.SelectedIndex = -1;
+            }
             panelForActions.Enabled = true;
+            comboBoxDrinks.Enabled = true;
+            afterChangebuttonAdd = false;
         }
 
         private void comboBoxDrinks_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (index < 0)
-                index = comboBoxDrinks.SelectedIndex;
-
-            if (index != comboBoxDrinks.SelectedIndex)
+            if (comboBoxDrinks.SelectedIndex != -1)
             {
-                buildList[index].ClearPanel();
-                index = comboBoxDrinks.SelectedIndex;
+                if (index < 0)
+                    index = comboBoxDrinks.SelectedIndex;
+
+                if (index != comboBoxDrinks.SelectedIndex)
+                {
+                    if (!afterChangebuttonAdd)
+                        buildList[index].ClearPanel();
+                    index = comboBoxDrinks.SelectedIndex;
+                }
+                Builder.DAdd temp = AddElementToList;
+                buildList[comboBoxDrinks.SelectedIndex].MakingPanel(panelForActions, temp);
             }
-            Builder.DAdd temp = AddElementToList;
-            buildList[comboBoxDrinks.SelectedIndex].MakingPanel(panelForActions,temp);
+            
             
         }
 
@@ -90,19 +103,19 @@ namespace Hierarchy
 
         private void buttonChanging_Click(object sender, EventArgs e)
         {
-            if (listBoxForDrinks.SelectedIndex != -1)
+            if (listBoxForDrinks.SelectedIndex != -1 )
             {
-              /*  if (comboBoxDrinks.SelectedIndex != -1)
-                {
-                    buildList[comboBoxDrinks.SelectedIndex].ClearPanel();
-                }*/
                 string type = ListOfDrinks[listBoxForDrinks.SelectedIndex].TypeName;
-               
+                afterChangebuttonAdd = true;
                 int i;
                 for (i =0; i < buildList.Count; i++)
                 {
                     if (buildList[i].Name == type)
                     {
+                        if (comboBoxDrinks.SelectedIndex != -1)
+                        {
+                            buildList[comboBoxDrinks.SelectedIndex].ClearPanel();
+                        }
                         panelForActions.Enabled = true;
                         comboBoxDrinks.SelectedIndex = i;
                         indexForChange = listBoxForDrinks.SelectedIndex;

@@ -12,18 +12,22 @@ namespace Hierarchy
     {
         public XMLSerializerer()
         {
-
+           
         }
+
+        XmlSerializer serializer;
 
         public void Serialize(Stream stream, object element)
         {
-            XmlSerializer serializer = new XmlSerializer(element.GetType());
+            serializer = new XmlSerializer(element.GetType());
             serializer.Serialize(stream, element);
         }
 
-        public void Deserialize(Stream stream)
+        public object Deserialize(Stream stream,object element)
         {
-
+            XmlSerializer serializer = new XmlSerializer(element.GetType());
+            element = serializer.Deserialize(stream) ;
+            return element ;
         }
     }
 }

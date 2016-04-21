@@ -23,6 +23,7 @@ namespace Hierarchy
         int index;
         int indexForChange;
         bool afterChangebuttonAdd;
+        DictionaryForSerialize a = new DictionaryForSerialize();
 
         public HierarchyForm()
         {
@@ -146,59 +147,28 @@ namespace Hierarchy
             }
         }
 
+        
+
+        
+
         private void buttonSerialize_Click(object sender, EventArgs e)
         {
             if (saveFileDialog1.ShowDialog() == DialogResult.Cancel)
                 return;
             string filename = saveFileDialog1.FileName;
             int exe = saveFileDialog1.FilterIndex;
+           
             try
             {
-
-
-                switch (exe)
+                using (FileStream fs = new FileStream(filename, FileMode.Create, FileAccess.Write))
                 {
-                    case 1:
-                        {
-                            using (FileStream fs = new FileStream(filename, FileMode.Create, FileAccess.Write))
-                            {
-                                XmlSerializer serializer = new XmlSerializer(ListOfDrinks.GetType());                               
-                                serializer.Serialize(fs, ListOfDrinks);                                
-                            }
-                            break;
-                        }
-                    case 2:
-                        {
-                            BinaryFormatter formatter = new BinaryFormatter();
-
-                            using (FileStream fs = new FileStream(filename, FileMode.Create))
-                            {
-                                
-                                formatter.Serialize(fs, ListOfDrinks);
-                            }
-                            break;
-                        }
-                    case 3:
-                        {
-                            using (StreamWriter fs = new StreamWriter(filename))
-                            {
-                                foreach (Drinks el in ListOfDrinks)
-                                {
-                                    //byte[] array = System.Text.Encoding.Default.GetBytes(el.ToText()+"\n");
-                                    // запись массива байтов в файл
-                                    fs.WriteLine(el.ToText());
-                                }
-                            }
-                            break;
-                        }
-
+                    a.dict[exe].Serialize(fs, ListOfDrinks);
                 }
             }
             catch (Exception exept1)
             {
                 MessageBox.Show(exept1.Message.ToString());
             }
-
         }
 
         private void buttonDesirealize_Click(object sender, EventArgs e)
@@ -207,107 +177,12 @@ namespace Hierarchy
                 return;
             string filename = openFileDialog1.FileName;
             int exe = openFileDialog1.FilterIndex;
-           /* //IDictionary<int, ISeril> dict
-            //Dict by index serializer
-
-            using (FileStream fs = new FileStream(filename, FileMode.OpenOrCreate))
-            {
-                //serializer.Serialize()
-            }
-            */
             try
-            {
-                switch (exe)
+            { 
+                using (FileStream fs = new FileStream(filename, FileMode.OpenOrCreate))
                 {
-                    case 1:
-                        {
-                            using (FileStream fs = new FileStream(filename, FileMode.OpenOrCreate))
-                            {
-                                XmlSerializer serializer = new XmlSerializer(ListOfDrinks.GetType());
-                                ListOfDrinks = (List<Drinks>)serializer.Deserialize(fs);
-                                listBoxForDrinks.Items.Clear();
-                                foreach(Drinks element in ListOfDrinks)
-                                {
-
-                                    listBoxForDrinks.Items.Add(element.ToString());
-                                }
-                            }
-                            break;
-                        }
-                    case 2:
-                        {
-                            BinaryFormatter formatter = new BinaryFormatter();
-                            using (FileStream fs = new FileStream(filename, FileMode.OpenOrCreate))
-                            {
-                                ListOfDrinks = (List<Drinks>)formatter.Deserialize(fs);
-                                listBoxForDrinks.Items.Clear();
-                                foreach (Drinks element in ListOfDrinks)
-                                {
-
-                                    listBoxForDrinks.Items.Add(element.ToString());
-                                }
-                            }
-                            break;
-                        }
-                    case 3:
-                        {
-                            using (FileStream fstream = File.OpenRead(filename))
-                            {
-                                byte[] array = new byte[fstream.Length];
-                                fstream.Read(array, 0, array.Length);
-                                string textFromFile = System.Text.Encoding.Default.GetString(array);
-                                string[] lines = textFromFile.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                                foreach(string line in lines)
-                                {
-                                    string[] words = line.Split(new char[] { ' ','\r','\n' }, StringSplitOptions.RemoveEmptyEntries);
-                                    Drinks element= new Vine(); 
-                                    switch (words[0])
-                                    {
-                                        case "Vine":
-                                            {
-                                                string a = words[1];
-                                                double b = Convert.ToDouble(words[2]);
-                                                int c = Convert.ToInt32(words[3]);
-                                                int d = Convert.ToInt32(words[4]);
-                                                element = new Vine(a, b, c, d);
-                                               // element = new Vine(words[1],Convert.ToDouble(words[2]),Convert.ToInt32( words[3]), Convert.ToInt32(words[4]));
-                                                break;
-                                            }
-                                        case "Beer":
-                                            {
-                                                Leaven temp = new Leaven(Convert.ToInt32(words[4]), Convert.ToInt32(words[5]), Convert.ToInt32(words[6]), Convert.ToInt32(words[7]), Convert.ToInt32(words[8]));
-                                                element = new Beer(words[1], Convert.ToDouble(words[2]), Convert.ToInt32(words[3]), temp);
-                                                break;
-                                            }
-                                        case "Cognac":
-                                            {
-                                                element = new Cognac(words[1], Convert.ToDouble(words[2]), Convert.ToInt32(words[3]), Convert.ToInt32(words[4]));
-                                                break;
-                                            }
-                                        case "Kvass":
-                                            {
-                                                Leaven temp = new Leaven(Convert.ToInt32(words[3]), Convert.ToInt32(words[4]), Convert.ToInt32(words[5]), Convert.ToInt32(words[6]), Convert.ToInt32(words[7]));
-                                                element = new Kvass(words[1], Convert.ToDouble(words[2]), temp);
-                                                break;
-                                            }
-                                        case "Milk":
-                                            {
-                                                element = new Milk(words[1], Convert.ToDouble(words[2]), Convert.ToDouble(words[3]));
-                                                break;
-                                            }
-                                        case "Lemonade":
-                                            {
-                                                element = new Lemonade(words[1], Convert.ToDouble(words[2]), Convert.ToInt32(words[3]));
-                                                break;
-                                            }
-
-                                    }
-                                    ListOfDrinks.Add(element);
-                                    listBoxForDrinks.Items.Add(element.ToString());
-                                }
-                            }
-                            break;
-                        }
+                        ListOfDrinks = (List<Drinks>)a.dict[exe].Deserialize(fs, ListOfDrinks);
+                        AddElementsToListBoxAfterDeserialization();
                 }
             }
             catch (Exception exx)
@@ -315,6 +190,15 @@ namespace Hierarchy
                 MessageBox.Show(exx.Message.ToString());
             }
             
+        }
+
+        private void AddElementsToListBoxAfterDeserialization()
+        {
+            listBoxForDrinks.Items.Clear();
+            foreach (Drinks element in ListOfDrinks)
+            {
+                listBoxForDrinks.Items.Add(element.ToString());
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)

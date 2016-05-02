@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml.Serialization;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
+using System.ComponentModel.Composition;
+using System.ComponentModel.Composition.Hosting;
+using System.Reflection;
+
+
+using InterfacePlugin;
 
 namespace Hierarchy
 {
@@ -18,18 +16,41 @@ namespace Hierarchy
     {
         
         public List<Drinks> ListOfDrinks = new List<Drinks>();
+        [ImportMany(typeof(IPlugin))]
+        List<IPlugin> Plugins { get; set; }
+        
 
         BuilderList buildList = new BuilderList();
         int index;
         int indexForChange;
         bool afterChangebuttonAdd;
         DictionaryForSerialize a = new DictionaryForSerialize();
+        List<string> ArchivateExtensions = new List<string>();
 
         public HierarchyForm()
         {
             InitializeComponent();
             AdditingElementsToCombobox();
             panelForActions.Enabled = false;
+            comboBoxForArhivate.Items.Add("<Without>");
+            comboBoxForArhivate.SelectedIndex = 0;
+            /* DirectoryCatalog m_catalog = new DirectoryCatalog("Plugins");
+             CompositionContainer container = new CompositionContainer(m_catalog);
+             container.ComposeParts(this);
+             */
+            DirectoryCatalog m_catalog = new DirectoryCatalog("Plugins");
+            CompositionContainer container = new CompositionContainer(m_catalog);
+            container.ComposeParts(this);
+
+            if (Plugins == null) return;
+    
+            foreach (var plugin in Plugins) 
+            {
+                comboBoxForArhivate.Items.Add(plugin.Name);
+                ArchivateExtensions.Add(plugin.Exe);
+            }
+      
+           
         }
 
         public void AdditingElementsToCombobox()
@@ -181,7 +202,7 @@ namespace Hierarchy
             { 
                 using (FileStream fs = new FileStream(filename, FileMode.OpenOrCreate))
                 {
-                        ListOfDrinks = (List<Drinks>)a.dict[exe].Deserialize(fs, ListOfDrinks);
+                        ListOfDrinks = (List<Drinks>)a.dict[exe].Deserialize(fs, ListOfDrinks); 
                         AddElementsToListBoxAfterDeserialization();
                 }
             }

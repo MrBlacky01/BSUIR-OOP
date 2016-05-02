@@ -39,6 +39,8 @@
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.buttonClear = new System.Windows.Forms.Button();
+            this.comboBoxForArhivate = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.panelForActions.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -138,11 +140,31 @@
             this.buttonClear.UseVisualStyleBackColor = true;
             this.buttonClear.Click += new System.EventHandler(this.button1_Click);
             // 
+            // comboBoxForArhivate
+            // 
+            this.comboBoxForArhivate.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxForArhivate.FormattingEnabled = true;
+            this.comboBoxForArhivate.Location = new System.Drawing.Point(131, 456);
+            this.comboBoxForArhivate.Name = "comboBoxForArhivate";
+            this.comboBoxForArhivate.Size = new System.Drawing.Size(99, 21);
+            this.comboBoxForArhivate.TabIndex = 8;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(12, 459);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(101, 13);
+            this.label1.TabIndex = 9;
+            this.label1.Text = "Type of archivation:";
+            // 
             // HierarchyForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(870, 462);
+            this.ClientSize = new System.Drawing.Size(873, 491);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.comboBoxForArhivate);
             this.Controls.Add(this.buttonClear);
             this.Controls.Add(this.buttonDesirealize);
             this.Controls.Add(this.buttonSerialize);
@@ -156,6 +178,7 @@
             this.Text = "Hierarchy";
             this.panelForActions.ResumeLayout(false);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -171,6 +194,8 @@
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
         private System.Windows.Forms.Button buttonClear;
+        private System.Windows.Forms.ComboBox comboBoxForArhivate;
+        private System.Windows.Forms.Label label1;
     }
 }
 

@@ -5,6 +5,7 @@ using System.IO;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.Reflection;
+using System.Text;
 
 
 using InterfacePlugin;
@@ -181,18 +182,29 @@ namespace Hierarchy
         private void buttonSerialize_Click(object sender, EventArgs e)
         {
             if (saveFileDialog1.ShowDialog() == DialogResult.Cancel)
-                return;
-            
-            int exe = saveFileDialog1.FilterIndex;
+                return;           
             int archivateIndex = comboBoxForArhivate.SelectedIndex;
-            saveFileDialog1.FileName +="." + ArchivateExtensions[archivateIndex - 1];
-            string filename = saveFileDialog1.FileName;
+            string filename =  saveFileDialog1.FileName;
+            StringBuilder extension = new StringBuilder(filename);
+            int i;
+            for ( i = extension.Length-1; i>0; i--)
+            {
+                if (extension[i] == '.')
+                {
+                    break;
+                }
+            }
+            extension.Remove(0, i+1);
             try
             {
                 using (FileStream fs = new FileStream(filename, FileMode.Create, FileAccess.Write))
                 {
-                    
-                    Serializers.dict[exe].Serialize(fs, ListOfDrinks);
+                     
+                    Serializers.dict[extension.ToString()].Serialize(fs, ListOfDrinks);   
+                }
+                if (archivateIndex > 0)
+                {
+                    Plugins[archivateIndex - 1].Archivate(filename);
                 }
             }
             catch (Exception exept1)
@@ -211,7 +223,7 @@ namespace Hierarchy
             { 
                 using (FileStream fs = new FileStream(filename, FileMode.OpenOrCreate))
                 {
-                        ListOfDrinks = (List<Drinks>)Serializers.dict[exe].Deserialize(fs, ListOfDrinks); 
+                        ListOfDrinks = (List<Drinks>)Serializers.dict["xml"].Deserialize(fs, ListOfDrinks); 
                         AddElementsToListBoxAfterDeserialization();
                 }
             }

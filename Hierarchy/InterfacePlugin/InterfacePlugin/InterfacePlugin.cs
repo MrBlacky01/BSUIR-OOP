@@ -4,8 +4,8 @@ namespace InterfacePlugin
 {
     public interface IPlugin
     {
-        void Archivate(Stream stream, string path);
-        void Dearchivate(Stream stream);
+        void Archivate(string path);
+        void Dearchivate(string stream);
         string Name { get; }
         string Exe { get; }
     }

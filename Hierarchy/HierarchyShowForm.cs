@@ -24,7 +24,7 @@ namespace Hierarchy
         int index;
         int indexForChange;
         bool afterChangebuttonAdd;
-        DictionaryForSerialize a = new DictionaryForSerialize();
+        DictionaryForSerialize Serializers = new DictionaryForSerialize();
         List<string> ArchivateExtensions = new List<string>();
 
         public HierarchyForm()
@@ -38,19 +38,25 @@ namespace Hierarchy
              CompositionContainer container = new CompositionContainer(m_catalog);
              container.ComposeParts(this);
              */
+            AddPlugins();
+      
+           
+        }
+
+        private void AddPlugins()
+        {
             DirectoryCatalog m_catalog = new DirectoryCatalog("Plugins");
             CompositionContainer container = new CompositionContainer(m_catalog);
             container.ComposeParts(this);
 
             if (Plugins == null) return;
-    
-            foreach (var plugin in Plugins) 
+
+            foreach (var plugin in Plugins)
             {
                 comboBoxForArhivate.Items.Add(plugin.Name);
                 ArchivateExtensions.Add(plugin.Exe);
+                openFileDialog1.Filter += "|" + plugin.Name + "|*." + plugin.Exe;
             }
-      
-           
         }
 
         public void AdditingElementsToCombobox()
@@ -176,14 +182,17 @@ namespace Hierarchy
         {
             if (saveFileDialog1.ShowDialog() == DialogResult.Cancel)
                 return;
-            string filename = saveFileDialog1.FileName;
+            
             int exe = saveFileDialog1.FilterIndex;
-           
+            int archivateIndex = comboBoxForArhivate.SelectedIndex;
+            saveFileDialog1.FileName +="." + ArchivateExtensions[archivateIndex - 1];
+            string filename = saveFileDialog1.FileName;
             try
             {
                 using (FileStream fs = new FileStream(filename, FileMode.Create, FileAccess.Write))
                 {
-                    a.dict[exe].Serialize(fs, ListOfDrinks);
+                    
+                    Serializers.dict[exe].Serialize(fs, ListOfDrinks);
                 }
             }
             catch (Exception exept1)
@@ -202,7 +211,7 @@ namespace Hierarchy
             { 
                 using (FileStream fs = new FileStream(filename, FileMode.OpenOrCreate))
                 {
-                        ListOfDrinks = (List<Drinks>)a.dict[exe].Deserialize(fs, ListOfDrinks); 
+                        ListOfDrinks = (List<Drinks>)Serializers.dict[exe].Deserialize(fs, ListOfDrinks); 
                         AddElementsToListBoxAfterDeserialization();
                 }
             }

@@ -124,7 +124,7 @@
             // openFileDialog1
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
-            this.openFileDialog1.Filter = "XML|*.xml|Binary|*.dat|Text|*.txt";
+            this.openFileDialog1.Filter = "All files|*|XML|*.xml|Binary|*.dat|Text|*.txt";
             // 
             // saveFileDialog1
             // 

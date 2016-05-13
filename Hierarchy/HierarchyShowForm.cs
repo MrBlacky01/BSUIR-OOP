@@ -217,14 +217,50 @@ namespace Hierarchy
         {
             if (openFileDialog1.ShowDialog() == DialogResult.Cancel)
                 return;
-            string filename = openFileDialog1.FileName;
-            int exe = openFileDialog1.FilterIndex;
-            try
-            { 
-                using (FileStream fs = new FileStream(filename, FileMode.OpenOrCreate))
+            bool isArchivated = false;
+            StringBuilder filename = new StringBuilder( openFileDialog1.FileName);
+            StringBuilder extension = new StringBuilder(filename.ToString());
+            int i;
+            for (i = extension.Length - 1; i > 0; i--)
+            {
+                if (extension[i] == '.')
                 {
-                        ListOfDrinks = (List<Drinks>)Serializers.dict["xml"].Deserialize(fs, ListOfDrinks); 
+                    break;
+                }
+            }
+            extension.Remove(0, i + 1);
+            if ( ArchivateExtensions.Contains(extension.ToString()))
+            {
+                for (int j = 0; j < Plugins.Count;j++)
+                {
+                    if (Plugins[j].Exe == extension.ToString())
+                    {
+                        Plugins[j].Dearchivate(filename.ToString());
+                        filename.Replace("."+extension.ToString(), "");
+                        extension = new StringBuilder(filename.ToString());
+                        isArchivated = true; 
+                        for (i = extension.Length - 1; i > 0; i--)
+                        {
+                            if (extension[i] == '.')
+                            {
+                                break;
+                            }
+                        }
+                        extension.Remove(0, i + 1);
+                    }
+                }
+            }
+            try
+            {
+                if (Serializers.dict.ContainsKey(extension.ToString()) == false) throw new Exception("Unnown type for deserialize ");
+                using (FileStream fs = new FileStream(filename.ToString(), FileMode.OpenOrCreate))
+                {
+                        ListOfDrinks = (List<Drinks>)Serializers.dict[extension.ToString()].Deserialize(fs, ListOfDrinks); 
                         AddElementsToListBoxAfterDeserialization();
+                }
+                if (isArchivated )
+                {
+                    File.Delete(filename.ToString());
                 }
             }
             catch (Exception exx)

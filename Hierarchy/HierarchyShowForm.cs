@@ -27,6 +27,7 @@ namespace Hierarchy
         bool afterChangebuttonAdd;
         DictionaryForSerialize Serializers = new DictionaryForSerialize();
         List<string> ArchivateExtensions = new List<string>();
+        
 
         public HierarchyForm()
         {
@@ -57,6 +58,7 @@ namespace Hierarchy
                 comboBoxForArhivate.Items.Add(plugin.Name);
                 ArchivateExtensions.Add(plugin.Exe);
                 openFileDialog1.Filter += "|" + plugin.Name + "|*." + plugin.Exe;
+                Serializers.dict.Add(plugin.Exe, new ArchivatorToSerializatorAdapter(plugin));
             }
         }
 
@@ -204,7 +206,8 @@ namespace Hierarchy
                 }
                 if (archivateIndex > 0)
                 {
-                    Plugins[archivateIndex - 1].Archivate(filename);
+                    Serializers.dict[ArchivateExtensions[archivateIndex - 1]].Serialize(new MemoryStream(), filename);
+                    //Plugins[archivateIndex - 1].Archivate(filename);
                 }
             }
             catch (Exception exept1)
@@ -231,7 +234,19 @@ namespace Hierarchy
             extension.Remove(0, i + 1);
             if ( ArchivateExtensions.Contains(extension.ToString()))
             {
-                for (int j = 0; j < Plugins.Count;j++)
+                Serializers.dict[extension.ToString()].Deserialize(new MemoryStream(), filename.ToString());
+                filename.Replace("." + extension.ToString(), "");
+                extension = new StringBuilder(filename.ToString());
+                isArchivated = true;
+                for (i = extension.Length - 1; i > 0; i--)
+                {
+                    if (extension[i] == '.')
+                    {
+                        break;
+                    }
+                }
+                extension.Remove(0, i + 1);
+                /*for (int j = 0; j < Plugins.Count;j++)
                 {
                     if (Plugins[j].Exe == extension.ToString())
                     {
@@ -248,7 +263,7 @@ namespace Hierarchy
                         }
                         extension.Remove(0, i + 1);
                     }
-                }
+                }*/
             }
             try
             {

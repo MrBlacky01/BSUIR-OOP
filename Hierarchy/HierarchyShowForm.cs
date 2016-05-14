@@ -7,7 +7,6 @@ using System.ComponentModel.Composition.Hosting;
 using System.Reflection;
 using System.Text;
 
-
 using InterfacePlugin;
 
 namespace Hierarchy
@@ -27,7 +26,9 @@ namespace Hierarchy
         bool afterChangebuttonAdd;
         DictionaryForSerialize Serializers = new DictionaryForSerialize();
         List<string> ArchivateExtensions = new List<string>();
-        
+        Invoker user = new Invoker();
+       
+
 
         public HierarchyForm()
         {
@@ -36,13 +37,13 @@ namespace Hierarchy
             panelForActions.Enabled = false;
             comboBoxForArhivate.Items.Add("<Without>");
             comboBoxForArhivate.SelectedIndex = 0;
+            comboBox1.SelectedIndex = 0;
             /* DirectoryCatalog m_catalog = new DirectoryCatalog("Plugins");
              CompositionContainer container = new CompositionContainer(m_catalog);
              container.ComposeParts(this);
              */
             AddPlugins();
-      
-           
+            
         }
 
         private void AddPlugins()
@@ -129,7 +130,6 @@ namespace Hierarchy
                 listBoxForDrinks.Items.RemoveAt(listBoxForDrinks.SelectedIndex);
             }
           
-            
         }
 
         private void buttonChanging_Click(object sender, EventArgs e)
@@ -177,32 +177,41 @@ namespace Hierarchy
             }
         }
 
-        
-
-        
-
         private void buttonSerialize_Click(object sender, EventArgs e)
         {
             if (saveFileDialog1.ShowDialog() == DialogResult.Cancel)
                 return;           
             int archivateIndex = comboBoxForArhivate.SelectedIndex;
-            string filename =  saveFileDialog1.FileName;
-            StringBuilder extension = new StringBuilder(filename);
-            int i;
-            for ( i = extension.Length-1; i>0; i--)
+            ClearReceiver receiver;
+            if (archivateIndex > 0)
             {
-                if (extension[i] == '.')
-                {
-                    break;
-                }
+               receiver = new ClearReceiver(comboBox1.SelectedIndex, saveFileDialog1.FileName,
+               ListOfDrinks, ArchivateExtensions[archivateIndex - 1], Serializers);
             }
-            extension.Remove(0, i+1);
+            else
+            {
+               receiver = new ClearReceiver(comboBox1.SelectedIndex, saveFileDialog1.FileName,
+               ListOfDrinks, null, Serializers);
+            }
+            user.SetCommand(new ClearReceiverCommand(receiver));
+            user.PressButton();
+           /* string filename =  saveFileDialog1.FileName;
+            string  extension = GetExtension(filename);
             try
             {
-                using (FileStream fs = new FileStream(filename, FileMode.Create, FileAccess.Write))
+                if (comboBox1.SelectedIndex == 1)
                 {
-                     
-                    Serializers.dict[extension.ToString()].Serialize(fs, ListOfDrinks);   
+                    ISerializable temp = Serializers.dict[extension.ToString()];
+                    temp = new DeflateDecorator(temp, filename);
+                    temp.Serialize(new MemoryStream(), ListOfDrinks);
+                    return;
+                }
+                else
+                {
+                    using (FileStream fs = new FileStream(filename, FileMode.Create, FileAccess.Write))
+                    {
+                        Serializers.dict[extension.ToString()].Serialize(fs, ListOfDrinks);
+                    }
                 }
                 if (archivateIndex > 0)
                 {
@@ -213,7 +222,7 @@ namespace Hierarchy
             catch (Exception exept1)
             {
                 MessageBox.Show(exept1.Message.ToString());
-            }
+            }*/
         }
 
         private void buttonDesirealize_Click(object sender, EventArgs e)
@@ -222,46 +231,21 @@ namespace Hierarchy
                 return;
             bool isArchivated = false;
             StringBuilder filename = new StringBuilder( openFileDialog1.FileName);
-            StringBuilder extension = new StringBuilder(filename.ToString());
-            int i;
-            for (i = extension.Length - 1; i > 0; i--)
-            {
-                if (extension[i] == '.')
-                {
-                    break;
-                }
-            }
-            extension.Remove(0, i + 1);
+            string extension = GetExtension(filename.ToString());
+            
             if ( ArchivateExtensions.Contains(extension.ToString()))
             {
                 Serializers.dict[extension.ToString()].Deserialize(new MemoryStream(), filename.ToString());
                 filename.Replace("." + extension.ToString(), "");
-                extension = new StringBuilder(filename.ToString());
+                extension = GetExtension(filename.ToString());
                 isArchivated = true;
-                for (i = extension.Length - 1; i > 0; i--)
-                {
-                    if (extension[i] == '.')
-                    {
-                        break;
-                    }
-                }
-                extension.Remove(0, i + 1);
                 /*for (int j = 0; j < Plugins.Count;j++)
                 {
                     if (Plugins[j].Exe == extension.ToString())
                     {
                         Plugins[j].Dearchivate(filename.ToString());
                         filename.Replace("."+extension.ToString(), "");
-                        extension = new StringBuilder(filename.ToString());
-                        isArchivated = true; 
-                        for (i = extension.Length - 1; i > 0; i--)
-                        {
-                            if (extension[i] == '.')
-                            {
-                                break;
-                            }
-                        }
-                        extension.Remove(0, i + 1);
+                        extension = GetExtension(filename.ToString());
                     }
                 }*/
             }
@@ -283,6 +267,21 @@ namespace Hierarchy
                 MessageBox.Show(exx.Message.ToString());
             }
             
+        }
+
+        private string GetExtension(string name)
+        {
+            StringBuilder extension = new StringBuilder(name);
+            int i;
+            for (i = extension.Length - 1; i > 0; i--)
+            {
+                if (extension[i] == '.')
+                {
+                    break;
+                }
+            }
+            extension.Remove(0, i + 1);
+            return extension.ToString();
         }
 
         private void AddElementsToListBoxAfterDeserialization()

@@ -8,7 +8,7 @@ namespace Hierarchy
 {
     class DictionaryForSerialize
     {
-        public Dictionary<string,ISerializable> dict { get;private set; }
+        public Dictionary<string,ISerializable> dict { get; set; }
 
         public DictionaryForSerialize ()
         {
